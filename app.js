@@ -8,7 +8,7 @@ function app(people){
   var searchType = promptFor("Do you know the name of the person you are looking for? Enter 'yes' or 'no'", yesNo).toLowerCase();
   switch(searchType){
     case 'yes':
-    // TODO: search by name
+    searchByName(people);
     break;
     case 'no':
     searchByTraits(people);
@@ -92,9 +92,14 @@ function mainMenu(person, people){
 function searchByName(people){
   var firstName = promptFor("What is the person's first name?", chars);
   var lastName = promptFor("What is the person's last name?", chars);
-
   // TODO: find the person using the name they entered
-
+  for(var i = 0; i < people.length; i++ )
+  {
+    if (people[i].firstName==firstName && people[i].lastName==lastName)
+    {
+      displayPerson(people[i]);
+    }
+  }
 }
 
 // alerts a list of people
@@ -109,6 +114,11 @@ function displayPerson(person){
   // height, weight, age, name, occupation, eye color.
   var personInfo = "First Name: " + person.firstName + "\n";
   personInfo += "Last Name: " + person.lastName + "\n";
+  personInfo += "Height: " + person.height + "\n";
+  personInfo += "Weight: " + person.weight + "\n";
+  personInfo += "Occupation: " + person.occupation + "\n";
+  personInfo += "Eye Color: " + person.eyeColor + "\n";
+
   // TODO: finish getting the rest of the information to display
   alert(personInfo);
 }
