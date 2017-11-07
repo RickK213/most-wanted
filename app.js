@@ -75,7 +75,7 @@ function mainMenu(person, people){
     // TODO: get person's info
     break;
     case "family":
-      var family = searchFamily();
+      var family = searchFamily(person, people);
     break;
     case "descendants":
     // TODO: get person's descendants
@@ -131,12 +131,11 @@ function yesNo(input){
 function chars(input){
   return true; // default validation only
 }
-function searchFamily(person){
-  person = data[8]
+function searchFamily(person, people){
   let family = [];
   let member;
   for(let i=0; i<data.length; i++){
-    member = data[i];
+    member = people[i];
     if (person.id === member.currentSpouse || person.parents.includes(member.id) || member.parents.includes(person.id) || person.parents.includes(member.parents)){
       let familyMember = (member.firstName + " " + member.lastName);
       family.push(" " + familyMember);
@@ -148,5 +147,5 @@ function searchFamily(person){
     return family;
   }
 
-
+searchFamily(person, people);
   
