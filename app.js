@@ -1,60 +1,115 @@
-//test for git
 /*
 Build all of your functions for displaying and gathering information below (GUI).
 */
-// yo
 // app is the function called to start the entire application
 function app(people){
   var searchType = promptFor("Do you know the name of the person you are looking for? Enter 'yes' or 'no'", yesNo).toLowerCase();
   switch(searchType){
     case 'yes':
       searchByName();
-    break;
+      break;
     case 'no':
-    searchByTraits(people);
-    break;
+      let searchByTraitsArray = searchByTraits(people);
+      let message = 'The people who meet this search criteria are: ';
+      for( let i=0; i<searchByTraitsArray.length; i++){
+        message += searchByTraitsArray[i];
+        if ( i === searchByTraitsArray.length-1 ) {
+          message += ".";
+        }
+        else {
+          message += ", ";
+        }
+      }
+      alert(message);
+      break;
     default:
-    alert("Wrong! Please try again, following the instructions dummy. :)");
-    app(people); // restart app
-    break;
+      alert("Wrong! Please try again, following the instructions dummy. :)");
+      //app(people); // restart app
+      break;
+  }
+}
+
+//TO DO: Finsish writing this validation helper function and incorporate it into promptFor
+function isNumber(input){
+  if ( !isNaN(input) ) {
+    return false;
+  }
+  else {
+    return true;
   }
 }
 
 function searchByTraits(people) {
-  let userSearchChoice = prompt("What would you like to search by? 'height', 'weight', 'eye color', 'gender', 'age', 'occupation'.");
-  let filteredPeople;
-
-  switch(userSearchChoice) {
-    case "height":
-      filteredPeople = searchByHeight(people);
-      break;
-    case "weight":
-      filteredPeople = searchByWeight(people);
-      break;
-    // so on and so forth
-    default:
-      alert("You entered an invalid search type! Please try again.");
-      searchByTraits(people);
-      break;
-  }  
-
-  let foundPerson = filteredPeople[0];
-
-  mainMenu(foundPerson, people);
-
+  let userSearchChoice = prompt("What would you like to search by? You can enter multiple options. Each option should be one word separated by a comma. The options are 'height, 'weight', 'eyecolor', 'gender', 'age', 'occupation'. For example: 'height, eyecolor, age'");
+  // TO DO: clean up the string? Why aren't .trim or .replace working? Because javascript?
+  // let cleanString = userSearchChoice.trim();
+  // console.log(cleanString);
+  let searchCategories = userSearchChoice.split(",");
+  let searchTerms = [];
+  for ( let i=0; i<searchCategories.length; i++ ) {
+    //TO DO: Validate user input
+    //criteriaTerms.push(promptFor( ('What ' + criteriaArray[i] + ' would you like to search for?'),isNumber ));
+    searchTerms.push(prompt('What ' + searchCategories[i] + ' would you like to search for?'));
+  }
+  for ( let i=0; i<searchCategories.length; i++ ) {
+    if ( searchCategories[i] === "weight" || searchCategories[i] === "height" || searchCategories[i] === "age" ) {
+      searchTerms[i] = parseInt(searchTerms[i]);
+    }
+    if ( searchCategories[i] === "eyecolor" ) {
+      searchCategories[i] = "eyeColor";
+    }
+  }
+  let totalResults = searchByCriteria(searchCategories, searchTerms, people);
+  let countRequired = searchCategories.length;
+  let idArray = [];
+  for ( let i=0; i<totalResults.length; i++ ) {
+    idArray.push(totalResults[i].id);
+  }
+  let filteredIDs = [];
+  for ( let i=0; i<idArray.length; i++ ) {
+    let iDCount = getIDCount(idArray[i],idArray);
+    if(iDCount === countRequired){
+      filteredIDs.push(idArray[i]);
+      idArray = idArray.filter(function(el){
+        if ( el === idArray[i] ) {
+          return false;
+        } else {
+          return true;
+        }
+      });
+    }
+  }
+  let filteredNames = [];
+  for ( let i=0; i<people.length; i++ ) {
+    if ( filteredIDs.includes(people[i].id) ) {
+      filteredNames.push(people[i].firstName + " " + people[i].lastName);
+    }
+  }
+  return filteredNames;
 }
 
-function searchByWeight(people) {
-  let userInputWeight = prompt("How much does the person weigh?");
-
-  let newArray = people.filter(function (el) {
-    if(el.weight == userInputWeight) {
-      return true;
+function getIDCount(id, idArray){
+  let iDCount = 0;
+  for ( let i=0; i<idArray.length; i++ ) {
+    if ( idArray[i] === id ) {
+      iDCount++;
     }
-    // return true if el.height matches userInputHeight
-  });
+  }
+  return iDCount;
+}
 
-  return newArray;
+function searchByCriteria(searchCategories, searchTerms, people) {
+  let totalResults = [];
+  let result;
+  for(let i=0; i<searchCategories.length; i++){
+    result = people.filter(function(el){
+      if ( el[searchCategories[i]] === searchTerms[i] ) {
+        return true;
+      }
+    });
+    totalResults = totalResults.concat(result);
+  }
+  return totalResults;
 }
 
 // Menu function to call once you find who you are looking for
@@ -71,14 +126,15 @@ function mainMenu(person, people){
 
   switch(displayOption){
     case "info":
-    // TODO: get person's info
-    break;
+      // TODO: get person's info
+      break;
     case "family":
-    // TODO: get person's family
-    break;
+      // TODO: get person's family
+      break;
     case "descendants":
-    // TODO: get person's descendants
-    break;
+      let descendentsNameArray = getDecendents([person]);
+      alert(person.firstName + ' ' + person.lastName + '\'s decendents are: ' + descendentsNameArray);
+      break;
     case "restart":
     app(people); // restart
     break;
@@ -87,6 +143,32 @@ function mainMenu(person, people){
     default:
     return mainMenu(person, people); // ask again
   }
+}
+
+function getDecendents(person, people, nextDescendents=[]){
+
+  let totalDescendents = nextDescendents;
+  let childrenArray = nextDescendents;
+  if(person.length>0){
+    let children;
+    for ( let i=0; i<person.length; i++ ) {
+      children = people.filter(function(el){
+        return el.parents.includes(person[i].id);
+      });
+      childrenArray = childrenArray.concat(children);
+    }
+    nextDescendents = childrenArray;
+    
+    return getDecendents(children, people, nextDescendents);
+  
+  } else {
+    let descendentsNameArray = [];
+    for (let i=0; i<totalDescendents.length; i++) {
+      descendentsNameArray.push(totalDescendents[i].firstName + ' ' + totalDescendents[i].lastName);
+    }
+    return descendentsNameArray;
+  }
+
 }
 
 function searchByName(people){
