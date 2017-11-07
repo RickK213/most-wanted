@@ -7,24 +7,7 @@ function app(people){
   var searchType = promptFor("Do you know the name of the person you are looking for? Enter 'yes' or 'no'", yesNo).toLowerCase();
   switch(searchType){
     case 'yes':
-    searchByName(people);
-    break;
-    case 'no':
-    searchByTraits(people);
-    break;
-    default:
-    alert("Wrong! Please try again, following the instructions dummy. :)");
-    // app(people); // restart app
-    break;
-  }
-}
-
-function searchByTraits(people) {
-  let userSearchChoice = prompt("What would you like to search by? 'height', 'weight', 'eye color', 'gender', 'age', 'occupation'.");
-  let filteredPeople;
-
-  switch(userSearchChoice) {
-    case "height":
+      searchByName(people);
       break;
     case 'no':
       let searchByTraitsArray = searchByTraits(people);
@@ -42,7 +25,7 @@ function searchByTraits(people) {
       break;
     default:
       alert("Wrong! Please try again, following the instructions dummy. :)");
-      //app(people); // restart app
+      app(people); // restart app
       break;
   }
 }
@@ -254,4 +237,5 @@ function searchFamily(person, people){
     }
     alert("Family members:" + family);
     return family;
-  }  
+  }
+  
