@@ -1,3 +1,5 @@
+"use strict";
+
 /*
 Build all of your functions for displaying and gathering information below (GUI).
 */
@@ -41,10 +43,21 @@ function isNumber(input){
 }
 
 function searchByTraits(people) {
+  // let isValidInput = true;
+  // while ( isValidInput ) {
+
+  // }
   let userSearchChoice = prompt("What would you like to search by? You can enter multiple options. Each option should be one word separated by a comma. The options are 'height, 'weight', 'eyecolor', 'gender', 'age', 'occupation'. For example: 'height, eyecolor, age'");
   // TO DO: clean up the string? Why aren't .trim or .replace working? Because javascript?
-  // let cleanString = userSearchChoice.trim();
-  // console.log(cleanString);
+  let stringArray = userSearchChoice.split(',');
+  console.log(stringArray);
+  for (let i=0; i<stringArray; i++) {
+    stringArray[i] = stringArray[i].trim();
+  }
+  let cleanString = stringArray.join(',');
+  //let cleanString = userSearchChoice.trim();
+  //let cleanString = userSearchChoice.replace(" ", "");
+  console.log(cleanString);
   let searchCategories = userSearchChoice.split(",");
   let searchTerms = [];
   for ( let i=0; i<searchCategories.length; i++ ) {
