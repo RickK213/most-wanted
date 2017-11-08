@@ -42,27 +42,36 @@ function isNumber(input){
   }
 }
 
-function searchByTraits(people) {
-  // let isValidInput = true;
-  // while ( isValidInput ) {
+function getCleanWord(word){
+  return word.trim();
+}
 
-  // }
-  let userSearchChoice = prompt("What would you like to search by? You can enter multiple options. Each option should be one word separated by a comma. The options are 'height, 'weight', 'eyecolor', 'gender', 'age', 'occupation'. For example: 'height, eyecolor, age'");
-  // TO DO: clean up the string? Why aren't .trim or .replace working? Because javascript?
-  let stringArray = userSearchChoice.split(',');
-  console.log(stringArray);
-  for (let i=0; i<stringArray; i++) {
-    stringArray[i] = stringArray[i].trim();
+function checkForValidTrait(userInput){
+  let traits = userInput.split(",");
+  for ( let i=0; i<traits.length; i++ ) {
+    let trait = getCleanWord(traits[i]);
+    if ( !(trait === "height" || trait === "weight" || trait === "eyecolor" || trait === "gender" || trait === "age" || trait === "occupation") ) {
+      return false;
+    } else {
+      return true;
+    }
   }
-  let cleanString = stringArray.join(',');
-  //let cleanString = userSearchChoice.trim();
-  //let cleanString = userSearchChoice.replace(" ", "");
-  console.log(cleanString);
+}
+
+function searchByTraits(people) {
+  let isValidInput = false;
+  let userSearchChoice;
+  while ( !isValidInput ) {
+    userSearchChoice = prompt("What would you like to search by? You can enter multiple options. Each option should be one word separated by a comma. The options are 'height', 'weight', 'eyecolor', 'gender', 'age', 'occupation'. For example: 'height,eyecolor,age'");
+    isValidInput = checkForValidTrait(userSearchChoice);
+    if ( !isValidInput ) {
+      alert("You can only enter valid search options. Please try again.");
+    }
+  }
   let searchCategories = userSearchChoice.split(",");
   let searchTerms = [];
   for ( let i=0; i<searchCategories.length; i++ ) {
-    //TO DO: Validate user input
-    //criteriaTerms.push(promptFor( ('What ' + criteriaArray[i] + ' would you like to search for?'),isNumber ));
+    searchCategories[i] = getCleanWord(searchCategories[i]);
     searchTerms.push(prompt('What ' + searchCategories[i] + ' would you like to search for?'));
   }
   for ( let i=0; i<searchCategories.length; i++ ) {
@@ -142,8 +151,9 @@ function mainMenu(person, people){
     case "info":
       // TODO: get person's info
       break;
-    case "family":
-      var family = searchFamily(person, people);
+    case "info":
+      let family = searchFamily(person, people);
+      alert("Family members:" + family);
       break;
     case "descendants":
       let descendentsNameArray = getDecendents([person]);
@@ -239,16 +249,13 @@ function chars(input){
 function searchFamily(person, people){
   let family = [];
   let member;
-  for(let i=0; i<data.length; i++){
+  for(let i=0; i<people.length; i++){
     member = people[i];
     if (person.id === member.currentSpouse || person.parents.includes(member.id) || member.parents.includes(person.id) || person.parents.includes(member.parents)){
       let familyMember = (member.firstName + " " + member.lastName);
       family.push(" " + familyMember);
     }
-    else{
-    }
-    }
-    alert("Family members:" + family);
-    return family;
   }
+  return family;
+}
   
