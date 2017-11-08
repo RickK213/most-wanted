@@ -253,10 +253,11 @@ function displayPerson(person){
   personInfo += "Weight: " + person.weight + "\n";
   personInfo += "Occupation: " + person.occupation + "\n";
   personInfo += "Eye Color: " + person.eyeColor + "\n";
-
-
+  let age = getAge(person);
+  personInfo += "Age: " + age + "\n";
+  
   // TODO: finish getting the rest of the information to display
-  return personInfo;
+  return(personInfo);
 }
 
 // function that prompts and validates user input
@@ -289,3 +290,21 @@ function searchFamily(person, people){
   return family;
 }
   
+function getAge(person)
+{
+  var age;
+  
+  var today = new Date(); 
+ 
+  let dob = person.dob;
+
+   dob = dob.split("/");
+
+  let birthDay = new Date(parseInt(dob[2]), parseInt(dob[0]), parseInt(dob[1]));
+  
+  age = today.getYear() - birthDay.getYear();
+
+  let ageString = age.toString();
+  
+  return ageString;
+}
