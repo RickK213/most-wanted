@@ -47,13 +47,12 @@ function getCleanWord(word){
 }
 
 function checkForValidTrait(userInput){
+  let isValid = true;
   let traits = userInput.split(",");
   for ( let i=0; i<traits.length; i++ ) {
     let trait = getCleanWord(traits[i]);
     if ( !(trait === "height" || trait === "weight" || trait === "eyecolor" || trait === "gender" || trait === "age" || trait === "occupation") ) {
-      return false;
-    } else {
-      return true;
+      isValid = false;
     }
   }
 }
