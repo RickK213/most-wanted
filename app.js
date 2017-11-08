@@ -1,4 +1,3 @@
-//rick
 "use strict";
 
 /*
