@@ -9,7 +9,14 @@ function app(people){
   var searchType = promptFor("Do you know the name of the person you are looking for? Enter 'yes' or 'no'", yesNo).toLowerCase();
   switch(searchType){
     case 'yes':
-      searchByName(people);
+      let personArray = searchByName(people);
+      if (personArray.length < 2){
+        mainMenu(personArray[0]);
+      }
+      else {
+      let person = selectPerson(personArray);
+      mainMenu(person);
+      }
       break;
     case 'no':
       let searchByTraitResults = searchByTraits(people);
@@ -148,7 +155,7 @@ function mainMenu(person, people){
     return app(people); // restart
   }
 
-  var displayOption = prompt("Found " + person.firstName + " " + person.lastName + " . Do you want to know their 'info', 'family', or 'descendants'? Type the option you want or 'restart' or 'quit'");
+  var displayOption = prompt("For " + person.firstName + " " + person.lastName + " . Do you want to know their 'info', 'family', or 'descendants'? Type the option you want or 'restart' or 'quit'");
 
   switch(displayOption){
     case "info":
@@ -219,7 +226,7 @@ function searchByName(people) {
       message += displayPerson(results[i]);
       message += "\n";
     }
-    alert(message);
+    return results;
   }
 }
 // alerts a list of people
@@ -292,4 +299,22 @@ function getAge(person)
   let ageString = age.toString();
   
   return ageString;
+}
+// let peopleArray = [data[20],data[21]];  <-----test data for selectPerson.
+// console.log(peopleArray);
+// selectPerson(peopleArray);
+function selectPerson(peopleArray){
+  let namesOfPeopleArray = [];
+  for (let i=0; i<peopleArray.length; i++){
+    namesOfPeopleArray.push(i+1 + ".");
+    namesOfPeopleArray.push(peopleArray[i].firstName);
+    namesOfPeopleArray.push(peopleArray[i].lastName);
+  }
+  let namesOfPeople = namesOfPeopleArray.join(" ");
+  alert(namesOfPeople);
+  let userPersonChoice = prompt("Found: " + namesOfPeople + "\nPlease type number corresponding to your choice.");
+  console.log(userPersonChoice);
+  let person = peopleArray[userPersonChoice-1];
+  console.log(person);
+  return person;
 }
