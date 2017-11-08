@@ -12,18 +12,8 @@ function app(people){
       searchByName(people);
       break;
     case 'no':
-      let searchByTraitsArray = searchByTraits(people);
-      let message = 'The people who meet this search criteria are: ';
-      for( let i=0; i<searchByTraitsArray.length; i++){
-        message += searchByTraitsArray[i];
-        if ( i === searchByTraitsArray.length-1 ) {
-          message += ".";
-        }
-        else {
-          message += ", ";
-        }
-      }
-      alert(message);
+      let searchByTraitResults = searchByTraits(people);
+      console.log(searchByTraitResults);
       break;
     default:
       alert("Wrong! Please try again, following the instructions dummy. :)");
@@ -46,6 +36,13 @@ function getCleanWord(word){
   return word.trim();
 }
 
+function getCleanStringArray(arr){
+  for(let i=0; i<arr.length; i++){
+    arr[i] = getCleanWord(arr[i]);
+  }
+  return arr;
+}
+
 function checkForValidTrait(userInput){
   let isValid = true;
   let traits = userInput.split(",");
@@ -55,22 +52,27 @@ function checkForValidTrait(userInput){
       isValid = false;
     }
   }
+  return isValid;
 }
 
-function searchByTraits(people) {
+function getTraitInput(){
   let isValidInput = false;
-  let userSearchChoice;
+  let searchInput;
   while ( !isValidInput ) {
-    userSearchChoice = prompt("What would you like to search by? You can enter multiple options. Each option should be one word separated by a comma. The options are 'height', 'weight', 'eyecolor', 'gender', 'age', 'occupation'. For example: 'height,eyecolor,age'");
-    isValidInput = checkForValidTrait(userSearchChoice);
+    searchInput = prompt("What would you like to search by? You can enter multiple options. Each option should be one word separated by a comma.\nThe options are 'height', 'weight', 'eyecolor', 'gender', 'age', 'occupation'.\nFor example: 'height,eyecolor,age'");
+    isValidInput = checkForValidTrait(searchInput);
     if ( !isValidInput ) {
       alert("You can only enter valid search options. Please try again.");
     }
   }
-  let searchCategories = userSearchChoice.split(",");
+  let searchCategories = searchInput.split(",");
+  searchCategories = getCleanStringArray(searchCategories);
+  return searchCategories;
+}
+
+function getSearchTerms(searchCategories){
   let searchTerms = [];
   for ( let i=0; i<searchCategories.length; i++ ) {
-    searchCategories[i] = getCleanWord(searchCategories[i]);
     searchTerms.push(prompt('What ' + searchCategories[i] + ' would you like to search for?'));
   }
   for ( let i=0; i<searchCategories.length; i++ ) {
@@ -81,43 +83,45 @@ function searchByTraits(people) {
       searchCategories[i] = "eyeColor";
     }
   }
-  let totalResults = searchByCriteria(searchCategories, searchTerms, people);
-  let countRequired = searchCategories.length;
-  let idArray = [];
-  for ( let i=0; i<totalResults.length; i++ ) {
-    idArray.push(totalResults[i].id);
-  }
-  let filteredIDs = [];
-  for ( let i=0; i<idArray.length; i++ ) {
-    let iDCount = getIDCount(idArray[i],idArray);
-    if(iDCount === countRequired){
-      filteredIDs.push(idArray[i]);
-      idArray = idArray.filter(function(el){
-        if ( el === idArray[i] ) {
-          return false;
-        } else {
-          return true;
-        }
-      });
-    }
-  }
-  let filteredNames = [];
-  for ( let i=0; i<people.length; i++ ) {
-    if ( filteredIDs.includes(people[i].id) ) {
-      filteredNames.push(people[i].firstName + " " + people[i].lastName);
-    }
-  }
-  return filteredNames;
+  return searchTerms;
 }
 
-function getIDCount(id, idArray){
-  let iDCount = 0;
-  for ( let i=0; i<idArray.length; i++ ) {
-    if ( idArray[i] === id ) {
-      iDCount++;
+function getFilteredResults(totalResults, countRequired){
+  let filteredResults = [];
+  for ( let i=0; i<totalResults.length; i++ ) {
+    let personCount = getPersonCount(totalResults[i], totalResults);
+    if ( personCount === countRequired ) {
+      filteredResults.push(totalResults[i]);
+      totalResults = totalResults.filter(function(el){
+        if ( !(el.id === totalResults[i].id) ) {
+          return true;
+        } else {
+          return false;
+        }
+      });
+
     }
   }
-  return iDCount;
+  return filteredResults;  
+}
+
+function getPersonCount(person, totalResults){
+  let personCount = 0;
+  for ( let i=0; i<totalResults.length; i++ ) {
+    if ( totalResults[i].id === person.id ) {
+      personCount++;
+    }
+  }
+  return personCount;
+}
+
+function searchByTraits(people) {
+  let searchCategories = getTraitInput();
+  let searchTerms = getSearchTerms(searchCategories);
+  let totalResults = searchByCriteria(searchCategories, searchTerms, people);
+  let countRequired = searchCategories.length;
+  let filteredResults = getFilteredResults(totalResults, countRequired);
+  return filteredResults;
 }
 
 function searchByCriteria(searchCategories, searchTerms, people) {
@@ -194,24 +198,6 @@ function getDecendents(person, people, nextDescendents=[]){
 
 }
 
-// function searchByName(people){
-//   var firstName = promptFor("What is the person's first name?", chars);
-//   var lastName = promptFor("What is the person's last name?", chars);
-//   // TODO: find the person using the name they entered
-//   for(let i = 0; i < people.length; i++ ){
-//     if (people[i].firstName == firstName && people[i].lastName==lastName){
-//       console.log(people[i].firstName);
-//       console.log(people[i].lastName);
-//       console.log(firstName);
-//       console.log(lastName);
-//       displayPerson(people[i]);
-//     }
-//     else{
-//       alert("Could not find that person");
-//       searchByName();
-//     }
-//   }
-// }
 function searchByName(people) {
   var firstName = promptFor("What is the person's first name?", chars);
   var lastName = promptFor("What is the person's last name?", chars);
