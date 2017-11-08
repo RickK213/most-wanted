@@ -314,7 +314,7 @@ function getAge(person)
   
   return ageString;
 }
-// let peopleArray = [data[20],data[21]];  <-----test data for selectPerson
+// let peopleArray = [data[20],data[21]];  <-----test data for selectPerson.
 // console.log(peopleArray);
 // selectPerson(peopleArray);
 function selectPerson(peopleArray){
