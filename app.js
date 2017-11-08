@@ -1,4 +1,3 @@
-//Jamie
 "use strict";
 
 /*
