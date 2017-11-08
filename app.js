@@ -195,19 +195,48 @@ function getDecendents(person, people, nextDescendents=[]){
 
 }
 
-function searchByName(people){
+// function searchByName(people){
+//   var firstName = promptFor("What is the person's first name?", chars);
+//   var lastName = promptFor("What is the person's last name?", chars);
+//   // TODO: find the person using the name they entered
+//   for(let i = 0; i < people.length; i++ ){
+//     if (people[i].firstName == firstName && people[i].lastName==lastName){
+//       console.log(people[i].firstName);
+//       console.log(people[i].lastName);
+//       console.log(firstName);
+//       console.log(lastName);
+//       displayPerson(people[i]);
+//     }
+//     else{
+//       alert("Could not find that person");
+//       searchByName();
+//     }
+//   }
+// }
+function searchByName(people) {
   var firstName = promptFor("What is the person's first name?", chars);
   var lastName = promptFor("What is the person's last name?", chars);
   // TODO: find the person using the name they entered
-  for(var i = 0; i < people.length; i++ )
-  {
-    if (people[i].firstName==firstName && people[i].lastName==lastName)
-    {
-      displayPerson(people[i]);
+  let results = [];
+  for(var i=0; i<people.length; i++ ) {
+    if ( (people[i].firstName.toLowerCase()===firstName.toLowerCase()) && (people[i].lastName.toLowerCase()===lastName.toLowerCase()) ) {
+      results.push(people[i]);
+      // displayPerson(people[i]);
+    } 
+  }
+  if (results.length === 0){
+    alert("Could not find that person");
+    app(people);
+  }
+  else{
+    let message;
+    for(let i = 0; i < results.length; i++){
+      message += displayPerson(results[i]);
+      message += "\n";
     }
+    alert(message);
   }
 }
-
 // alerts a list of people
 function displayPeople(people){
   alert(people.map(function(person){
@@ -225,8 +254,9 @@ function displayPerson(person){
   personInfo += "Occupation: " + person.occupation + "\n";
   personInfo += "Eye Color: " + person.eyeColor + "\n";
 
+
   // TODO: finish getting the rest of the information to display
-  alert(personInfo);
+  return personInfo;
 }
 
 // function that prompts and validates user input
