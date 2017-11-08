@@ -29,7 +29,7 @@ function app(people){
   }
 }
 
-//TO DO: Finsish writing this validation helper function and incorporate it into promptFor
+//TO DO: Finsish writing this validation helper function and incorporate it into promptFor?
 function isNumber(input){
   if ( !isNaN(input) ) {
     return false;
