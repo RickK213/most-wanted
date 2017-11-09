@@ -199,6 +199,8 @@ function mainMenu(person, people){
       alert(personInfo);
       if (getStartAgain()) {
         app(people);
+      } else {
+        return;
       }
       break;
     case "family":
@@ -210,6 +212,8 @@ function mainMenu(person, people){
       }
       if (getStartAgain()) {
         app(people);
+      } else {
+        return;
       }
       break;
     case "descendants":
@@ -221,6 +225,8 @@ function mainMenu(person, people){
       }
       if (getStartAgain()) {
         app(people);
+      } else {
+        return;
       }
       break;
     case "restart":
@@ -298,7 +304,6 @@ function displayPerson(person){
   return(personInfo);
 }
 
-// function that prompts and validates user input
 function promptFor(question, valid){
   do{
     var response = prompt(question).trim();
@@ -306,14 +311,12 @@ function promptFor(question, valid){
   return response;
 }
 
-// helper function to pass into promptFor to validate yes/no answers
 function yesNo(input){
   return input.toLowerCase() == "yes" || input.toLowerCase() == "no";
 }
 
-// helper function to pass in as default promptFor validation
 function chars(input){
-  return true; // default validation only
+  return true;
 }
 
 function searchFamily(person, people){
