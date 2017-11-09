@@ -130,16 +130,20 @@ function getFilteredResults(totalResults, countRequired){
   let filteredResults = [];
   for ( let i=0; i<totalResults.length; i++ ) {
     let personCount = getPersonCount(totalResults[i], totalResults);
+    let currentIndex = i;
     if ( personCount === countRequired ) {
       filteredResults.push(totalResults[i]);
       totalResults = totalResults.filter(function(el){
-        if ( !(el.id === totalResults[i].id) ) {
+        if ( el.id === totalResults[currentIndex].id ) {
           i--;
-          return true;
-        } else {
           return false;
+        } else {
+          return true;
         }
       });
+    }
+    if ( i<0 ) {
+      i=0;
     }
   }
   return filteredResults;  
