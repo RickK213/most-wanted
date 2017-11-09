@@ -14,8 +14,8 @@ function app(people){
         mainMenu(personArray[0], people);
       }
       else {
-      let person = selectPerson(personArray[0]);
-      mainMenu(person, people);
+        let person = selectPerson(personArray[0]);
+        mainMenu(person, people);
       }
       break;
     case 'no':
@@ -24,8 +24,8 @@ function app(people){
         mainMenu(searchByTraitResults[0], people);
       }
       else {
-      let person = selectPerson(searchByTraitResults);
-      mainMenu(person, people);
+        let person = selectPerson(searchByTraitResults);
+        mainMenu(person, people);
       }
       break;
     default:
@@ -95,6 +95,9 @@ function getSearchTerms(searchCategories){
     if ( searchCategories[i] === "eyecolor" ) {
       searchCategories[i] = "eyeColor";
     }
+    if ( searchCategories[i] === "age" ) {
+      searchCategories[i] = "dob";
+    }
   }
   return searchTerms;
 }
@@ -137,13 +140,24 @@ function searchByTraits(people) {
   return filteredResults;
 }
 
+function convertBdayToAge(person){
+  let age = getAge(person);
+  person.dob = age;
+  return person;
+}
+
 function searchByCriteria(searchCategories, searchTerms, people) {
   let totalResults = [];
   let result;
+  people.map( function(el) {
+    return convertBdayToAge(el);
+  });
   for(let i=0; i<searchCategories.length; i++){
     result = people.filter(function(el){
       if ( el[searchCategories[i]] === searchTerms[i] ) {
         return true;
+      } else {
+        return false;
       }
     });
     totalResults = totalResults.concat(result);
@@ -160,52 +174,45 @@ function getStartAgain(){
   }
 }
 
-// Menu function to call once you find who you are looking for
 function mainMenu(person, people){
-
-  /* Here we pass in the entire person object that we found in our search, as well as the entire original dataset of people. We need people in order to find descendants and other information that the user may want. */
-
   if(!person){
-    alert("Could not find that individual.");
-    return app(people); // restart
+    alert("Sorry, we could not find the person you're looking for.");
+    return app(people);
   }
-
   var displayOption = prompt("For " + person.firstName + " " + person.lastName + ", do you want to know their 'info', 'family', or 'descendants'? Type the option you want or 'restart' or 'quit'");
-
   switch(displayOption){
     case "info":
       let personInfo = displayPerson(person);
       alert(personInfo);
       if (getStartAgain()) {
-        app(people); // restart
+        app(people);
       }
       break;
     case "family":
       let family = searchFamily(person, people);
       alert(person.firstName + " " + person.lastName + "'s family members are:" + family + ".");
       if (getStartAgain()) {
-        app(people); // restart
+        app(people);
       }
       break;
     case "descendants":
       let descendentsNameArray = getDecendents([person], people);
       alert(person.firstName + ' ' + person.lastName + '\'s decendents are: ' + descendentsNameArray);
       if (getStartAgain()) {
-        app(people); // restart
+        app(people);
       }
       break;
     case "restart":
-    app(people); // restart
-    break;
+      app(people);
+      break;
     case "quit":
-    return; // stop execution
+      return;
     default:
-    return mainMenu(person, people); // ask again
+      return mainMenu(person, people);
   }
 }
 
 function getDecendents(person, people, nextDescendents=[]){
-
   let totalDescendents = nextDescendents;
   let childrenArray = nextDescendents;
   if(person.length>0){
@@ -221,11 +228,16 @@ function getDecendents(person, people, nextDescendents=[]){
     return getDecendents(children, people, nextDescendents);
   
   } else {
-    let descendentsNameArray = [];
+    let descendentsNameString = "";
     for (let i=0; i<totalDescendents.length; i++) {
-      descendentsNameArray.push(totalDescendents[i].firstName + ' ' + totalDescendents[i].lastName);
+      descendentsNameString += totalDescendents[i].firstName + ' ' + totalDescendents[i].lastName;
+      if(i === totalDescendents.length-1){
+        descendentsNameString += '.';
+      } else {
+        descendentsNameString += ', ';
+      }
     }
-    return descendentsNameArray;
+    return descendentsNameString;
   }
 
 }
@@ -233,16 +245,14 @@ function getDecendents(person, people, nextDescendents=[]){
 function searchByName(people) {
   var firstName = promptFor("What is the person's first name?", chars);
   var lastName = promptFor("What is the person's last name?", chars);
-  // TODO: find the person using the name they entered
   let results = [];
   for(var i=0; i<people.length; i++ ) {
     if ( (people[i].firstName.toLowerCase()===firstName.toLowerCase()) && (people[i].lastName.toLowerCase()===lastName.toLowerCase()) ) {
       results.push(people[i]);
-      // displayPerson(people[i]);
     } 
   }
   if (results.length === 0){
-    alert("Could not find that person");
+    alert("Sorry, we could not find the person you're looking for.");
     app(people);
   }
   else{
@@ -262,18 +272,14 @@ function displayPeople(people){
 }
 
 function displayPerson(person){
-  // print all of the information about a person:
-  // height, weight, age, name, occupation, eye color.
-  var personInfo = "First Name: " + person.firstName + "\n";
+  let age = getAge(person);
+  let personInfo = "First Name: " + person.firstName + "\n";
   personInfo += "Last Name: " + person.lastName + "\n";
   personInfo += "Height: " + person.height + "\n";
   personInfo += "Weight: " + person.weight + "\n";
-  personInfo += "Occupation: " + person.occupation + "\n";
-  personInfo += "Eye Color: " + person.eyeColor + "\n";
-  let age = getAge(person);
   personInfo += "Age: " + age + "\n";
-  
-  // TODO: finish getting the rest of the information to display
+  personInfo += "Occupation: " + person.occupation + "\n";
+  personInfo += "Eye Color: " + person.eyeColor;
   return(personInfo);
 }
 
@@ -294,6 +300,7 @@ function yesNo(input){
 function chars(input){
   return true; // default validation only
 }
+
 function searchFamily(person, people){
   let family = [];
   let member;
@@ -307,27 +314,20 @@ function searchFamily(person, people){
   return family;
 }
   
-function getAge(person)
-{
-  var age;
-  
-  var today = new Date(); 
- 
-  let dob = person.dob;
-
-   dob = dob.split("/");
-
-  let birthDay = new Date(parseInt(dob[2]), parseInt(dob[0]), parseInt(dob[1]));
-  
-  age = today.getYear() - birthDay.getYear();
-
-  let ageString = age.toString();
-  
-  return ageString;
+function getAge(person) {
+  if ( (typeof person.dob) === "number" ) {
+    return person.dob;
+  } else {
+    let age;
+    let today = new Date(); 
+    let dob = person.dob;
+    dob = dob.split("/");
+    let birthDay = new Date(parseInt(dob[2]), parseInt(dob[0]), parseInt(dob[1]));
+    age = today.getYear() - birthDay.getYear();
+    return age;
+  }
 }
-// let peopleArray = [data[20],data[21]];  <-----test data for selectPerson.
-// console.log(peopleArray);
-// selectPerson(peopleArray);
+
 function selectPerson(peopleArray){
   let namesOfPeopleArray = [];
   for (let i=0; i<peopleArray.length; i++){
