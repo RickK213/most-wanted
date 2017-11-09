@@ -217,9 +217,9 @@ function mainMenu(person, people){
       }
       break;
     case "descendants":
-      let descendentsNames = getDecendents([person], people);
-      if ( descendentsNames.length>0 ) {
-        alert(person.firstName + ' ' + person.lastName + '\'s descendants are: ' + descendentsNames);
+      let descendantsNames = getDecendents([person], people);
+      if ( descendantsNames.length>0 ) {
+        alert(person.firstName + ' ' + person.lastName + '\'s descendants are: ' + descendantsNames);
       } else {
         alert(person.firstName + " " + person.lastName + " has no descendants. Sad!");
       }
@@ -239,9 +239,9 @@ function mainMenu(person, people){
   }
 }
 
-function getDecendents(person, people, nextDescendents=[]){
-  let totalDescendents = nextDescendents;
-  let childrenArray = nextDescendents;
+function getDecendents(person, people, nextdescendants=[]){
+  let totaldescendants = nextdescendants;
+  let childrenArray = nextdescendants;
   if(person.length>0){
     let children;
     for ( let i=0; i<person.length; i++ ) {
@@ -250,21 +250,21 @@ function getDecendents(person, people, nextDescendents=[]){
       });
       childrenArray = childrenArray.concat(children);
     }
-    nextDescendents = childrenArray;
+    nextdescendants = childrenArray;
     
-    return getDecendents(children, people, nextDescendents);
+    return getDecendents(children, people, nextdescendants);
   
   } else {
-    let descendentsNameString = "";
-    for (let i=0; i<totalDescendents.length; i++) {
-      descendentsNameString += totalDescendents[i].firstName + ' ' + totalDescendents[i].lastName;
-      if(i === totalDescendents.length-1){
-        descendentsNameString += '.';
+    let descendantsNameString = "";
+    for (let i=0; i<totaldescendants.length; i++) {
+      descendantsNameString += totaldescendants[i].firstName + ' ' + totaldescendants[i].lastName;
+      if(i === totaldescendants.length-1){
+        descendantsNameString += '.';
       } else {
-        descendentsNameString += ', ';
+        descendantsNameString += ', ';
       }
     }
-    return descendentsNameString;
+    return descendantsNameString;
   }
 
 }
@@ -354,7 +354,7 @@ function selectPerson(peopleArray){
     namesOfPeopleArray.push(peopleArray[i].lastName);
   }
   let namesOfPeople = namesOfPeopleArray.join(" ");
-  let userPersonChoice = prompt("Found: " + namesOfPeople + "\nPlease type number corresponding to your choice.");
+  let userPersonChoice = prompt("Found:\n" + namesOfPeople + "\n\nPlease type the number corresponding to the person you were looking for.");
   let person = peopleArray[userPersonChoice-1];
   return person;
 }
