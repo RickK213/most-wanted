@@ -83,10 +83,34 @@ function getTraitInput(){
   return searchCategories;
 }
 
+function checkForValidTerm(category, searchTerm){
+  let isValid = true;
+  let correctInput = "only characters";
+  if ( ( category === "age" || category === "weight" || category === "height" ) && ( !(/^\d+$/.test(searchTerm)) ) ) {
+    isValid = false;
+    correctInput = "a number";
+  }
+  if ( category === "gender" && !( searchTerm==="male" || searchTerm==="female" ) ) {
+    isValid = false;
+    correctInput = "male or female";
+  }
+  let validationObject = {isValid: isValid, correctInput: correctInput};
+  return validationObject;
+}
+
 function getSearchTerms(searchCategories){
   let searchTerms = [];
   for ( let i=0; i<searchCategories.length; i++ ) {
-    searchTerms.push(prompt('What ' + searchCategories[i] + ' would you like to search for?'));
+    let validationObject = {isValid: false, correctInput: ""};
+    while(!validationObject.isValid) {
+      let searchTerm = prompt('What ' + searchCategories[i] + ' would you like to search for?');
+      validationObject = checkForValidTerm(searchCategories[i],searchTerm);
+      if (validationObject.isValid) {
+        searchTerms.push(searchTerm);
+      } else {
+        alert("Sorry, you must enter " + validationObject.correctInput + " for " + searchCategories[i]);
+      }
+    }
   }
   for ( let i=0; i<searchCategories.length; i++ ) {
     if ( searchCategories[i] === "weight" || searchCategories[i] === "height" || searchCategories[i] === "age" ) {
@@ -110,12 +134,12 @@ function getFilteredResults(totalResults, countRequired){
       filteredResults.push(totalResults[i]);
       totalResults = totalResults.filter(function(el){
         if ( !(el.id === totalResults[i].id) ) {
+          i--;
           return true;
         } else {
           return false;
         }
       });
-
     }
   }
   return filteredResults;  
@@ -179,7 +203,7 @@ function mainMenu(person, people){
     alert("Sorry, we could not find the person you're looking for.");
     return app(people);
   }
-  var displayOption = prompt("For " + person.firstName + " " + person.lastName + ", do you want to know their 'info', 'family', or 'descendants'? Type the option you want or 'restart' or 'quit'");
+  var displayOption = prompt("Your search returned " + person.firstName + " " + person.lastName + ". Do you want to know their 'info', 'family', or 'descendants'? Type the option you want or 'restart' or 'quit'");
   switch(displayOption){
     case "info":
       let personInfo = displayPerson(person);
