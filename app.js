@@ -272,11 +272,6 @@ function mainMenu(person, people){
   }
 }
 
-
-
-
-
-
 function promptFor(question, valid){
   do{
     var response = prompt(question).trim();
