@@ -192,7 +192,7 @@ function mainMenu(person, people){
     alert("Sorry, we could not find the person you're looking for.");
     return app(people);
   }
-  var displayOption = prompt("Your search returned " + person.firstName + " " + person.lastName + ". Do you want to know their 'info', 'family', or 'descendants'? Type the option you want or 'restart' or 'quit'");
+  let displayOption = prompt("Your search returned " + person.firstName + " " + person.lastName + ". Do you want to know their 'info', 'family', or 'descendants'? Type the option you want or 'restart' or 'quit'");
   switch(displayOption){
     case "info":
       let personInfo = displayPerson(person);
@@ -235,6 +235,7 @@ function mainMenu(person, people){
     case "quit":
       return;
     default:
+      alert("Sorry, your options are 'info', 'family', 'descendants', 'restart' or 'quit' - Please try again.");
       return mainMenu(person, people);
   }
 }
