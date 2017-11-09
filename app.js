@@ -11,16 +11,22 @@ function app(people){
     case 'yes':
       let personArray = searchByName(people);
       if (personArray.length < 2){
-        mainMenu(personArray[0]);
+        mainMenu(personArray[0], people);
       }
       else {
-      let person = selectPerson(personArray);
-      mainMenu(person);
+      let person = selectPerson(personArray[0]);
+      mainMenu(person, people);
       }
       break;
     case 'no':
       let searchByTraitResults = searchByTraits(people);
-      console.log(searchByTraitResults);
+      if (searchByTraitResults.length < 2){
+        mainMenu(searchByTraitResults[0], people);
+      }
+      else {
+      let person = selectPerson(searchByTraitResults);
+      mainMenu(person, people);
+      }
       break;
     default:
       alert("Wrong! Please try again, following the instructions dummy. :)");
@@ -145,6 +151,15 @@ function searchByCriteria(searchCategories, searchTerms, people) {
   return totalResults;
 }
 
+function getStartAgain(){
+  let startAgain = promptFor("Would you like to search for another person? Please answer 'yes' or 'no'.", yesNo);
+  if (startAgain === 'yes') {
+    return true;
+  } else {
+    return false;
+  }
+}
+
 // Menu function to call once you find who you are looking for
 function mainMenu(person, people){
 
@@ -155,19 +170,29 @@ function mainMenu(person, people){
     return app(people); // restart
   }
 
-  var displayOption = prompt("For " + person.firstName + " " + person.lastName + " . Do you want to know their 'info', 'family', or 'descendants'? Type the option you want or 'restart' or 'quit'");
+  var displayOption = prompt("For " + person.firstName + " " + person.lastName + ", do you want to know their 'info', 'family', or 'descendants'? Type the option you want or 'restart' or 'quit'");
 
   switch(displayOption){
     case "info":
-      // TODO: get person's info
+      let personInfo = displayPerson(person);
+      alert(personInfo);
+      if (getStartAgain()) {
+        app(people); // restart
+      }
       break;
-    case "info":
+    case "family":
       let family = searchFamily(person, people);
-      alert("Family members:" + family);
+      alert(person.firstName + " " + person.lastName + "'s family members are:" + family + ".");
+      if (getStartAgain()) {
+        app(people); // restart
+      }
       break;
     case "descendants":
-      let descendentsNameArray = getDecendents([person]);
+      let descendentsNameArray = getDecendents([person], people);
       alert(person.firstName + ' ' + person.lastName + '\'s decendents are: ' + descendentsNameArray);
+      if (getStartAgain()) {
+        app(people); // restart
+      }
       break;
     case "restart":
     app(people); // restart
@@ -311,10 +336,7 @@ function selectPerson(peopleArray){
     namesOfPeopleArray.push(peopleArray[i].lastName);
   }
   let namesOfPeople = namesOfPeopleArray.join(" ");
-  alert(namesOfPeople);
   let userPersonChoice = prompt("Found: " + namesOfPeople + "\nPlease type number corresponding to your choice.");
-  console.log(userPersonChoice);
   let person = peopleArray[userPersonChoice-1];
-  console.log(person);
   return person;
 }
