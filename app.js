@@ -1,10 +1,5 @@
 "use strict";
 
-/*
-Build all of your functions for displaying and gathering information below (GUI).
-*/
-// app is the function called to start the entire application
-// searchFamily();
 function app(people){
   var searchType = promptFor("Do you know the name of the person you are looking for? Enter 'yes' or 'no'", yesNo).toLowerCase();
   switch(searchType){
@@ -30,18 +25,8 @@ function app(people){
       break;
     default:
       alert("Wrong! Please try again, following the instructions dummy. :)");
-      app(people); // restart app
+      app(people);
       break;
-  }
-}
-
-//TO DO: Finsish writing this validation helper function and incorporate it into promptFor?
-function isNumber(input){
-  if ( !isNaN(input) ) {
-    return false;
-  }
-  else {
-    return true;
   }
 }
 
@@ -72,10 +57,10 @@ function getTraitInput(){
   let isValidInput = false;
   let searchInput;
   while ( !isValidInput ) {
-    searchInput = prompt("What would you like to search by? You can enter multiple options. Each option should be one word separated by a comma.\nThe options are 'height', 'weight', 'eyecolor', 'gender', 'age', 'occupation'.\nFor example: 'height,eyecolor,age'");
+    searchInput = prompt("What would you like to search by? You can enter multiple options.\n\nEach option should be one word separated by a comma.\nThe options are 'height', 'weight', 'eyecolor', 'gender', 'age', 'occupation'.\n\nFor example: 'height,eyecolor,age'");
     isValidInput = checkForValidTrait(searchInput);
     if ( !isValidInput ) {
-      alert("You can only enter valid search options. Please try again.");
+      alert("You can only enter valid search options.\nThe options are 'height', 'weight', 'eyecolor', 'gender', 'age', 'occupation'.\nPlease try again.");
     }
   }
   let searchCategories = searchInput.split(",");
@@ -218,14 +203,22 @@ function mainMenu(person, people){
       break;
     case "family":
       let family = searchFamily(person, people);
-      alert(person.firstName + " " + person.lastName + "'s family members are:" + family + ".");
+      if ( family.length>0 ) {
+        alert(person.firstName + " " + person.lastName + "'s family members are:" + family + ".");
+      } else {
+        alert(person.firstName + " " + person.lastName + " has no family members. Sad!");
+      }
       if (getStartAgain()) {
         app(people);
       }
       break;
     case "descendants":
-      let descendentsNameArray = getDecendents([person], people);
-      alert(person.firstName + ' ' + person.lastName + '\'s decendents are: ' + descendentsNameArray);
+      let descendentsNames = getDecendents([person], people);
+      if ( descendentsNames.length>0 ) {
+        alert(person.firstName + ' ' + person.lastName + '\'s descendants are: ' + descendentsNames);
+      } else {
+        alert(person.firstName + " " + person.lastName + " has no descendants. Sad!");
+      }
       if (getStartAgain()) {
         app(people);
       }
@@ -292,12 +285,6 @@ function searchByName(people) {
     return results;
   }
 }
-// alerts a list of people
-function displayPeople(people){
-  alert(people.map(function(person){
-    return person.firstName + " " + person.lastName;
-  }).join("\n"));
-}
 
 function displayPerson(person){
   let age = getAge(person);
@@ -359,7 +346,7 @@ function getAge(person) {
 function selectPerson(peopleArray){
   let namesOfPeopleArray = [];
   for (let i=0; i<peopleArray.length; i++){
-    namesOfPeopleArray.push(i+1 + ".");
+    namesOfPeopleArray.push("\n" + (i+1) + ".");
     namesOfPeopleArray.push(peopleArray[i].firstName);
     namesOfPeopleArray.push(peopleArray[i].lastName);
   }
