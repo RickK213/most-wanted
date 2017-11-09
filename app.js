@@ -30,42 +30,8 @@ function app(people){
   }
 }
 
-function getCleanWord(word){
-  return word.trim();
-}
-
-function getCleanStringArray(arr){
-  for(let i=0; i<arr.length; i++){
-    arr[i] = getCleanWord(arr[i]);
-  }
-  return arr;
-}
-
-function checkForValidTrait(userInput){
-  let isValid = true;
-  let traits = userInput.split(",");
-  for ( let i=0; i<traits.length; i++ ) {
-    let trait = getCleanWord(traits[i]);
-    if ( !(trait === "height" || trait === "weight" || trait === "eyecolor" || trait === "gender" || trait === "age" || trait === "occupation") ) {
-      isValid = false;
-    }
-  }
-  return isValid;
-}
-
-function getTraitInput(){
-  let isValidInput = false;
-  let searchInput;
-  while ( !isValidInput ) {
-    searchInput = prompt("What would you like to search by? You can enter multiple options.\n\nEach option should be one word separated by a comma.\nThe options are 'height', 'weight', 'eyecolor', 'gender', 'age', 'occupation'.\n\nFor example: 'height,eyecolor,age'");
-    isValidInput = checkForValidTrait(searchInput);
-    if ( !isValidInput ) {
-      alert("You can only enter valid search options.\nThe options are 'height', 'weight', 'eyecolor', 'gender', 'age', 'occupation'.\nPlease try again.");
-    }
-  }
-  let searchCategories = searchInput.split(",");
-  searchCategories = getCleanStringArray(searchCategories);
-  return searchCategories;
+function chars(input){
+  return true;
 }
 
 function checkForValidTerm(category, searchTerm){
@@ -83,32 +49,89 @@ function checkForValidTerm(category, searchTerm){
   return validationObject;
 }
 
-function getSearchTerms(searchCategories){
-  let searchTerms = [];
-  for ( let i=0; i<searchCategories.length; i++ ) {
-    let validationObject = {isValid: false, correctInput: ""};
-    while(!validationObject.isValid) {
-      let searchTerm = prompt('What ' + searchCategories[i] + ' would you like to search for?');
-      validationObject = checkForValidTerm(searchCategories[i],searchTerm);
-      if (validationObject.isValid) {
-        searchTerms.push(searchTerm);
+function checkForValidTrait(userInput){
+  let isValid = true;
+  let traits = userInput.split(",");
+  for ( let i=0; i<traits.length; i++ ) {
+    let trait = getCleanWord(traits[i]);
+    if ( !(trait === "height" || trait === "weight" || trait === "eyecolor" || trait === "gender" || trait === "age" || trait === "occupation") ) {
+      isValid = false;
+    }
+  }
+  return isValid;
+}
+
+function convertBdayToAge(person){
+  let age = getAge(person);
+  person.dob = age;
+  return person;
+}
+
+function displayPerson(person){
+  let age = getAge(person);
+  let personInfo = "First Name: " + person.firstName + "\n";
+  personInfo += "Last Name: " + person.lastName + "\n";
+  personInfo += "Height: " + person.height + "\n";
+  personInfo += "Weight: " + person.weight + "\n";
+  personInfo += "Age: " + age + "\n";
+  personInfo += "Occupation: " + person.occupation + "\n";
+  personInfo += "Eye Color: " + person.eyeColor;
+  return(personInfo);
+}
+
+function getAge(person) {
+  if ( (typeof person.dob) === "number" ) {
+    return person.dob;
+  } else {
+    let age;
+    let today = new Date(); 
+    let dob = person.dob;
+    dob = dob.split("/");
+    let birthDay = new Date(parseInt(dob[2]), parseInt(dob[0]), parseInt(dob[1]));
+    age = today.getYear() - birthDay.getYear();
+    return age;
+  }
+}
+
+function getCleanStringArray(arr){
+  for(let i=0; i<arr.length; i++){
+    arr[i] = getCleanWord(arr[i]);
+  }
+  return arr;
+}
+
+function getCleanWord(word){
+  return word.trim();
+}
+
+function getDecendents(person, people, nextdescendants=[]){
+  let totaldescendants = nextdescendants;
+  let childrenArray = nextdescendants;
+  if(person.length>0){
+    let children;
+    for ( let i=0; i<person.length; i++ ) {
+      children = people.filter(function(el){
+        return el.parents.includes(person[i].id);
+      });
+      childrenArray = childrenArray.concat(children);
+    }
+    nextdescendants = childrenArray;
+    
+    return getDecendents(children, people, nextdescendants);
+  
+  } else {
+    let descendantsNameString = "";
+    for (let i=0; i<totaldescendants.length; i++) {
+      descendantsNameString += totaldescendants[i].firstName + ' ' + totaldescendants[i].lastName;
+      if(i === totaldescendants.length-1){
+        descendantsNameString += '.';
       } else {
-        alert("Sorry, you must enter " + validationObject.correctInput + " for " + searchCategories[i]);
+        descendantsNameString += ', ';
       }
     }
+    return descendantsNameString;
   }
-  for ( let i=0; i<searchCategories.length; i++ ) {
-    if ( searchCategories[i] === "weight" || searchCategories[i] === "height" || searchCategories[i] === "age" ) {
-      searchTerms[i] = parseInt(searchTerms[i]);
-    }
-    if ( searchCategories[i] === "eyecolor" ) {
-      searchCategories[i] = "eyeColor";
-    }
-    if ( searchCategories[i] === "age" ) {
-      searchCategories[i] = "dob";
-    }
-  }
-  return searchTerms;
+
 }
 
 function getFilteredResults(totalResults, countRequired){
@@ -144,38 +167,32 @@ function getPersonCount(person, totalResults){
   return personCount;
 }
 
-function searchByTraits(people) {
-  let searchCategories = getTraitInput();
-  let searchTerms = getSearchTerms(searchCategories);
-  let totalResults = searchByCriteria(searchCategories, searchTerms, people);
-  let countRequired = searchCategories.length;
-  let filteredResults = getFilteredResults(totalResults, countRequired);
-  return filteredResults;
-}
-
-function convertBdayToAge(person){
-  let age = getAge(person);
-  person.dob = age;
-  return person;
-}
-
-function searchByCriteria(searchCategories, searchTerms, people) {
-  let totalResults = [];
-  let result;
-  people.map( function(el) {
-    return convertBdayToAge(el);
-  });
-  for(let i=0; i<searchCategories.length; i++){
-    result = people.filter(function(el){
-      if ( el[searchCategories[i]] === searchTerms[i] ) {
-        return true;
+function getSearchTerms(searchCategories){
+  let searchTerms = [];
+  for ( let i=0; i<searchCategories.length; i++ ) {
+    let validationObject = {isValid: false, correctInput: ""};
+    while(!validationObject.isValid) {
+      let searchTerm = prompt('What ' + searchCategories[i] + ' would you like to search for?');
+      validationObject = checkForValidTerm(searchCategories[i],searchTerm);
+      if (validationObject.isValid) {
+        searchTerms.push(searchTerm);
       } else {
-        return false;
+        alert("Sorry, you must enter " + validationObject.correctInput + " for " + searchCategories[i]);
       }
-    });
-    totalResults = totalResults.concat(result);
+    }
   }
-  return totalResults;
+  for ( let i=0; i<searchCategories.length; i++ ) {
+    if ( searchCategories[i] === "weight" || searchCategories[i] === "height" || searchCategories[i] === "age" ) {
+      searchTerms[i] = parseInt(searchTerms[i]);
+    }
+    if ( searchCategories[i] === "eyecolor" ) {
+      searchCategories[i] = "eyeColor";
+    }
+    if ( searchCategories[i] === "age" ) {
+      searchCategories[i] = "dob";
+    }
+  }
+  return searchTerms;
 }
 
 function getStartAgain(){
@@ -185,6 +202,21 @@ function getStartAgain(){
   } else {
     return false;
   }
+}
+
+function getTraitInput(){
+  let isValidInput = false;
+  let searchInput;
+  while ( !isValidInput ) {
+    searchInput = prompt("What would you like to search by? You can enter multiple options.\n\nEach option should be one word separated by a comma.\nThe options are 'height', 'weight', 'eyecolor', 'gender', 'age', 'occupation'.\n\nFor example: 'height,eyecolor,age'");
+    isValidInput = checkForValidTrait(searchInput);
+    if ( !isValidInput ) {
+      alert("You can only enter valid search options.\nThe options are 'height', 'weight', 'eyecolor', 'gender', 'age', 'occupation'.\nPlease try again.");
+    }
+  }
+  let searchCategories = searchInput.split(",");
+  searchCategories = getCleanStringArray(searchCategories);
+  return searchCategories;
 }
 
 function mainMenu(person, people){
@@ -240,34 +272,35 @@ function mainMenu(person, people){
   }
 }
 
-function getDecendents(person, people, nextdescendants=[]){
-  let totaldescendants = nextdescendants;
-  let childrenArray = nextdescendants;
-  if(person.length>0){
-    let children;
-    for ( let i=0; i<person.length; i++ ) {
-      children = people.filter(function(el){
-        return el.parents.includes(person[i].id);
-      });
-      childrenArray = childrenArray.concat(children);
-    }
-    nextdescendants = childrenArray;
-    
-    return getDecendents(children, people, nextdescendants);
-  
-  } else {
-    let descendantsNameString = "";
-    for (let i=0; i<totaldescendants.length; i++) {
-      descendantsNameString += totaldescendants[i].firstName + ' ' + totaldescendants[i].lastName;
-      if(i === totaldescendants.length-1){
-        descendantsNameString += '.';
-      } else {
-        descendantsNameString += ', ';
-      }
-    }
-    return descendantsNameString;
-  }
 
+
+
+
+
+function promptFor(question, valid){
+  do{
+    var response = prompt(question).trim();
+  } while(!response || !valid(response));
+  return response;
+}
+
+function searchByCriteria(searchCategories, searchTerms, people) {
+  let totalResults = [];
+  let result;
+  people.map( function(el) {
+    return convertBdayToAge(el);
+  });
+  for(let i=0; i<searchCategories.length; i++){
+    result = people.filter(function(el){
+      if ( el[searchCategories[i]] === searchTerms[i] ) {
+        return true;
+      } else {
+        return false;
+      }
+    });
+    totalResults = totalResults.concat(result);
+  }
+  return totalResults;
 }
 
 function searchByName(people) {
@@ -293,31 +326,13 @@ function searchByName(people) {
   }
 }
 
-function displayPerson(person){
-  let age = getAge(person);
-  let personInfo = "First Name: " + person.firstName + "\n";
-  personInfo += "Last Name: " + person.lastName + "\n";
-  personInfo += "Height: " + person.height + "\n";
-  personInfo += "Weight: " + person.weight + "\n";
-  personInfo += "Age: " + age + "\n";
-  personInfo += "Occupation: " + person.occupation + "\n";
-  personInfo += "Eye Color: " + person.eyeColor;
-  return(personInfo);
-}
-
-function promptFor(question, valid){
-  do{
-    var response = prompt(question).trim();
-  } while(!response || !valid(response));
-  return response;
-}
-
-function yesNo(input){
-  return input.toLowerCase() == "yes" || input.toLowerCase() == "no";
-}
-
-function chars(input){
-  return true;
+function searchByTraits(people) {
+  let searchCategories = getTraitInput();
+  let searchTerms = getSearchTerms(searchCategories);
+  let totalResults = searchByCriteria(searchCategories, searchTerms, people);
+  let countRequired = searchCategories.length;
+  let filteredResults = getFilteredResults(totalResults, countRequired);
+  return filteredResults;
 }
 
 function searchFamily(person, people){
@@ -333,20 +348,6 @@ function searchFamily(person, people){
   return family;
 }
   
-function getAge(person) {
-  if ( (typeof person.dob) === "number" ) {
-    return person.dob;
-  } else {
-    let age;
-    let today = new Date(); 
-    let dob = person.dob;
-    dob = dob.split("/");
-    let birthDay = new Date(parseInt(dob[2]), parseInt(dob[0]), parseInt(dob[1]));
-    age = today.getYear() - birthDay.getYear();
-    return age;
-  }
-}
-
 function selectPerson(peopleArray){
   let namesOfPeopleArray = [];
   for (let i=0; i<peopleArray.length; i++){
@@ -358,4 +359,8 @@ function selectPerson(peopleArray){
   let userPersonChoice = prompt("Found:\n" + namesOfPeople + "\n\nPlease type the number corresponding to the person you were looking for.");
   let person = peopleArray[userPersonChoice-1];
   return person;
+}
+
+function yesNo(input){
+  return input.toLowerCase() == "yes" || input.toLowerCase() == "no";
 }
